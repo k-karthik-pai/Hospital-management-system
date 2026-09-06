@@ -1,0 +1,7 @@
+# Local patient records and compiled output
+/hospital_data.txt
+/patient
+*.exe
+*.o
+*.obj
+/build/

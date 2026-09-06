@@ -15,7 +15,7 @@ A menu-driven terminal application that simulates the front-desk operations of a
 
 - **Admit patients** — auto-assigns the next available bed out of 50, generates a unique patient ID
 - **View all patients** — tabular display of currently admitted patients with live bill totals
-- **Search by ID** — find any patient and view their full bill breakdown
+- **Search by ID** — find an admitted patient and view their full bill breakdown
 - **Update records** — modify a patient's diagnosis
 - **Billing system** — base charge of ₹3,000/day + additional charges (medicines, tests, etc.)
 - **Day increment** — manually advance a patient's stay counter and recalculate bill
@@ -35,42 +35,50 @@ This project was written to cover the following C++ units:
 | Inheritance | `Patient` extends `Person` |
 | Constructors & Copy Constructor | `Patient(const Patient& p)` |
 | Operator Overloading | `operator<<` for `Patient` |
-| Exception Handling | `BedNotAvailableException`, `PatientNotFoundException` |
+| Exception Handling | `BedNotAvailableException`, `std::invalid_argument` (an unused `PatientNotFoundException` is also declared) |
 | Templates | `searchPatient<T>()` |
 | File I/O | `saveToFile()`, `loadFromFile()` with `|`-delimited format |
 | STL Containers | `vector<Patient>` for patient list |
-| Arrays | `bool beds[100]` for bed tracking |
+| Arrays | `bool beds[100]` for bed tracking; 50 beds enabled in `main()` |
 
 ---
 
 ## Project Structure
 
-```
+```text
 Hospital-management-system/
-├── patient.cpp         # Full source code (365 lines)
-├── patient.exe         # Pre-compiled Windows executable
-└── hospital_data.txt   # Auto-generated data file (created on first run)
+├── patient.cpp         # Application source code
+├── README.md           # Project documentation
+├── LICENSE.txt         # MIT license
+└── .gitignore          # Excludes local records and build output
 ```
+
+`hospital_data.txt` is generated in the working directory when records are saved
+or the program exits normally. Executables and local records are not distributed
+as source files.
 
 ---
 
 ## How to Run
 
-**Option 1 — Run the pre-compiled executable (Windows)**
-```
-patient.exe
+Requires a C++11 or later compiler (for example, g++). No external libraries are
+needed. Run these commands from the project directory.
+
+**Windows (PowerShell, with g++ installed and on PATH)**
+
+```powershell
+g++ -std=c++11 -Wall -Wextra -pedantic patient.cpp -o patient.exe
+.\patient.exe
 ```
 
-**Option 2 — Compile from source**
+**Linux / macOS (with g++ installed)**
 
-Using g++:
 ```bash
-g++ patient.cpp -o patient
-./patient        # Linux/Mac
-patient.exe      # Windows
+g++ -std=c++11 -Wall -Wextra -pedantic patient.cpp -o patient
+./patient
 ```
 
-Using any C++11 or later compiler. No external dependencies.
+Choose **9. Exit** to close the application normally.
 
 ---
 
@@ -102,7 +110,9 @@ Example:
   Total           = ₹10,500
 ```
 
-A patient cannot be discharged until their bill is fully paid.
+A patient starts with one billed day. Days advance only through the menu, not automatically with elapsed time. A patient cannot be discharged until their bill is fully paid. Partial payments are rejected; overpayments return change.
+
+Payment clears the balance by setting `additionalCharges` to the negative room charge. This field therefore represents a balance adjustment after payment, not an itemized payment history. Adding charges or incrementing days after payment creates a new balance.
 
 ---
 
@@ -116,7 +126,27 @@ Records are stored in `hospital_data.txt` using a pipe-delimited format:
 <id>|<name>|<age>|<contact>|<disease>|<bed>|<additionalCharges>|<daysAdmitted>|<isAdmitted>
 ```
 
-The file is read on startup and written after every operation.
+The file is read on startup and rewritten after successful changes and on normal
+exit. Discharged records remain in the file but do not appear in searches or the
+active-patient list. `isAdmitted` is `1` for an active admission and `0` otherwise.
+
+## Scope and Limitations
+
+This is an educational console project, not a production hospital system.
+
+- Use fictional records: storage is plain text with no authentication or encryption.
+- Enter valid numeric values when prompted. Non-numeric input is not recovered
+  automatically; restart the application if the input stream fails.
+- Do not use `|` in text fields or manually edit the data file: the parser assumes
+  valid records and does not validate corrupted files or bed numbers.
+- Run one instance at a time from a writable directory. Save failures are not
+  reported, and concurrent instances can overwrite each other's records.
+- Back up `hospital_data.txt` before resetting or moving records. The file path
+  is relative to the directory from which the application is launched.
+
+## License
+
+Licensed under the [MIT License](LICENSE.txt).
 
 ---
 

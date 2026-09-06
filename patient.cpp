@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 #include <iomanip>
+#include <cstdlib>
+#include <stdexcept>
 using namespace std;
 
 // UNIT II: Base Class - Inheritance
@@ -63,6 +65,7 @@ public:
     void addCharges(double amount) { additionalCharges += amount; }
     void incrementDay() { daysAdmitted++; }
     void discharge() { isAdmitted = false; }
+    // Offset room charges to clear the balance; later days or charges become payable.
     void clearBill() { additionalCharges = -(daysAdmitted * 3000); }
     
     void display() const {
@@ -105,7 +108,7 @@ public:
     }
 };
 
-// UNIT III: Hospital Class - Arrays, Dynamic Allocation
+// Hospital class: fixed bed array and dynamically sized patient vector.
 class Hospital {
 private:
     vector<Patient> patients; // UNIT V: STL Container
@@ -126,6 +129,7 @@ public:
         BedNotAvailableException(string msg) : message(msg) {}
     };
     
+    // Declared for the coursework example; current searches return NULL instead.
     class PatientNotFoundException {
     public:
         string message;
